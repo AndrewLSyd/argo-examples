@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf-script-template-  # adds 5 alphanumeric suffix so it's unique
+spec:
+  entrypoint: script-template  # name of template we start at
+  templates:
+  - name: script-template
+    script:
+      image: python:3.8-slim
+      command: [python]
+      source: |
+        print("The script template was executed successfully")

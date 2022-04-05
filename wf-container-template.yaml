@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: wf-container-template-
+  generateName: wf-container-template-  # adds 5 alphanumeric suffix so it's unique
 spec:
-  entrypoint: container-template
+  entrypoint: container-template  # name of template we start at
   templates:
   - name: container-template
-    container:
+    container:  # syntax is similar?same? to Dockerfiles
       image: python:3.8-slim
       command: [echo, "The container template was executed successfully."]
