@@ -1,0 +1,73 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf-exercise-1-
+spec:
+  entrypoint: dag-template
+  templates:
+  - name: dag-template
+    dag:
+      tasks:
+      - name: TaskA-1
+        template: script-template
+      - name: TaskB-1
+        template: container-template
+        dependencies: [TaskA-1]
+      - name: TaskB-2
+        template: container-template
+        dependencies: [TaskB-1]
+      - name: TaskB-3
+        template: container-template
+        dependencies: [TaskB-2]
+      - name: TaskC
+        template: resource-template
+        dependencies: [TaskA-1]
+      - name: TaskD
+        template: resource-template
+        dependencies: [TaskC, TaskB-3]
+      - name: TaskA-2
+        template: resource-template
+        dependencies: [TaskD]
+        
+  - name: task-template
+    script:
+      image: python:3.8-slim
+      command: [python]
+      source: |
+        print("Task A executed with script template.")
+        
+  - name: script-template
+    script:
+      image: python:3.8-slim
+      command: [python]
+      source: |
+        print("The script template was executed successfully")
+        
+  - name: container-template
+    container:  # syntax is similar?same? to Dockerfiles
+      image: python:3.8-slim
+      command: [echo, "The container template was executed successfully."]
+      
+  - name: resource-template
+    resource:
+      action: create
+      manifest: |
+        apiVersion: argoproj.io/v1alpha1
+        kind: Workflow
+        metadata:
+          generateName: wf-test
+        spec:
+          entrypoint: test-template
+          templates:
+          - name: test-template
+            script:
+              image: python:3.8-slim
+              command: [python]
+              source: | 
+                for i in range(5):
+                   print("Task C executed in a resource template in a separate workflow")
+            
+              
+  - name: delay-template
+    suspend:
+      duration: "10s"

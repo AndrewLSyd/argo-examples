@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: wf-steps-template-serial
+spec:
+  entrypoint: dag-template
+  templates:
+  - name: dag-template
+    steps:
+    - - name: step1
+        template: task-template
+    - - name: step2
+        template: task-template
+      - name: step3  # single hyphen indicates this is executed in parallel with step2
+        template: task-template       
+    - - name: step4
+        template: task-template
+  - name: task-template
+    script:
+      image: python:3.8-slim
+      command: [python]
+      source: |
+        print("Task executed")
